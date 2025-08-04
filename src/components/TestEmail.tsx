@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, AlertCircle } from 'lucide-react';
+import { Send, AlertCircle, Loader2 } from 'lucide-react'; // Added Loader2
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -12,7 +12,7 @@ interface Template {
 interface Credentials {
   email: string;
   password: string;
-  provider?: 'outlook' | 'smtp';
+  provider?: 'outlook' | 'smtp' | 'gmail';
   host?: string;
   port?: number;
   secure?: boolean;
@@ -35,7 +35,19 @@ const TestEmail: React.FC<TestEmailProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const validateForm = () => {
-    // ... your validation logic is fine and remains here
+    if (!testEmail || !/\S+@\S+\.\S+/.test(testEmail)) {
+      setError('Please enter a valid test email address.');
+      return false;
+    }
+    if (!template) {
+      setError('Please select a template first.');
+      return false;
+    }
+    if (!credentials.email || !credentials.password) {
+      setError('Please enter your email credentials first.');
+      return false;
+    }
+    setError(null);
     return true;
   };
 
@@ -46,17 +58,12 @@ const TestEmail: React.FC<TestEmailProps> = ({
     const loadingToast = toast.loading('Sending test email...');
 
     try {
-      // FIX: Send the credentials from props directly.
-      // Do not hardcode the host/port here. Let the backend handle it.
-      // This makes your component reusable for custom SMTP servers.
       const payload = {
-        credentials, // Send the credentials object as is
+        credentials,
         template,
         testEmail
       };
-
-      console.log('Sending test email with payload:', payload);
-
+      
       const response = await axios.post('https://bulky-9eky.onrender.com/api/send-test', payload);
 
       toast.success(`Test email sent successfully via ${response.data.provider}!`);
@@ -65,19 +72,18 @@ const TestEmail: React.FC<TestEmailProps> = ({
       console.error('Error sending test email:', error);
       const errData = error.response?.data;
 
-      // Use the detailed error messages from the backend
       if (errData?.suggestion) {
         setError(`${errData.error}\n\nSuggestion: ${errData.suggestion}`);
-        toast.error(errData.error);
+        toast.error(errData.error, { duration: 5000 });
       } else if (errData?.error) {
         setError(errData.error);
         toast.error(errData.error);
       } else if (error.message.includes('Network Error')) {
-        const msg = 'Cannot connect to server. Please ensure the backend is running.';
+        const msg = 'Cannot connect to server. Ensure the backend is running.';
         setError(msg);
         toast.error(msg);
       } else {
-        const msg = 'An unknown error occurred. Check the console for details.';
+        const msg = 'An unknown error occurred. Check console for details.';
         setError(msg);
         toast.error(msg);
       }
@@ -87,40 +93,67 @@ const TestEmail: React.FC<TestEmailProps> = ({
     }
   };
 
-  // ... the rest of your JSX rendering can remain the same
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-600">
         Send a test email to verify your template and credentials before sending in bulk.
       </p>
-      <div>
-        <label htmlFor="test-email" className="block text-sm font-medium text-gray-700">
-          Test Email Address
+      
+      {/* START: ADDED EMAIL PREVIEW */}
+      {template && (
+        <div className="border-t pt-4">
+          <h3 className="text-base font-semibold leading-6 text-gray-900 mb-3">
+            Email Preview
+          </h3>
+          <div className="rounded-lg border bg-white p-4 shadow-sm">
+            <div className="flex items-baseline border-b pb-2">
+              <p className="text-sm font-medium text-gray-500 w-16 flex-shrink-0">Subject:</p>
+              <p className="ml-2 text-sm font-semibold text-gray-800">{template.subject}</p>
+            </div>
+            <div className="mt-4 text-sm text-gray-700">
+              <div 
+                className="prose prose-sm max-w-none max-h-60 overflow-y-auto" 
+                dangerouslySetInnerHTML={{ __html: template.body }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      {/* END: ADDED EMAIL PREVIEW */}
+
+      <div className="pt-4">
+        <label htmlFor="test-email" className="block text-sm font-medium text-gray-700 mb-1">
+          Test Recipient Email
         </label>
-        <div className="mt-1 flex rounded-md shadow-sm">
+        <div className="flex rounded-md shadow-sm">
           <input
             type="email"
             name="test-email"
             id="test-email"
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="test@example.com"
+            className="block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            placeholder="recipient@example.com"
             disabled={isSending}
           />
           <button
             type="button"
             onClick={handleSendTest}
-            disabled={isSending || !testEmail}
-            className="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSending || !testEmail || !template}
+            className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Send size={16} className="mr-2" />
-            {isSending ? 'Sending...' : 'Send Test'}
+            {isSending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Send size={16} />
+            )}
+            <span className='ml-2'>{isSending ? 'Sending...' : 'Send Test'}</span>
           </button>
         </div>
       </div>
+      
       {error && (
-        <div className="flex items-start text-red-600 text-sm bg-red-50 p-3 rounded">
+        <div className="flex items-start text-red-600 text-sm bg-red-50 p-3 rounded-md">
           <AlertCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
           <div className="whitespace-pre-wrap">{error}</div>
         </div>
