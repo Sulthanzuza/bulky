@@ -78,7 +78,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUpload }) => {
       const response = await axios.post<UploadResponse>('https://bulky-9eky.onrender.com/api/upload', formData);
       
       setUploadResult(response.data);
-      onUpload(true); // Notify parent component of success
+      onUpload(true); 
       toast.success(`Success! Found ${response.data.emailCount} emails.`);
     } catch (error: any) {
       console.error('Upload error:', error);
