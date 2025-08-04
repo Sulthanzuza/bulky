@@ -57,7 +57,7 @@ const TestEmail: React.FC<TestEmailProps> = ({
 
       console.log('Sending test email with payload:', payload);
 
-      const response = await axios.post('http://localhost:3001/api/send-test', payload);
+      const response = await axios.post('https://bulky-9eky.onrender.com/api/send-test', payload);
 
       toast.success(`Test email sent successfully via ${response.data.provider}!`);
       setError(null);

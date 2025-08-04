@@ -93,7 +93,7 @@ const BulkSend: React.FC<BulkSendProps> = ({
 
       console.log('Sending bulk emails with provider:', formattedCredentials.provider);
 
-      const response = await axios.post('http://localhost:3001/api/send-bulk', {
+      const response = await axios.post('https://bulky-9eky.onrender.com/api/send-bulk', {
         credentials: formattedCredentials,
         template
       });
