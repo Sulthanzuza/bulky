@@ -14,9 +14,20 @@ export const uploadExcel = async (req: Request, res: Response) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No file was uploaded.' });
     }
+
     currentExcelFile = req.file.path;
-    // Use the new function to get recipient data
-    extractedData = extractRecipientDataFromExcel(currentExcelFile);
+    
+    try {
+      // Safely attempt to extract data
+      extractedData = extractRecipientDataFromExcel(currentExcelFile);
+    } catch (parsingError: any) {
+      // This catch block will trigger if the Excel file is unreadable
+      console.error('Error parsing Excel file:', parsingError.message);
+      return res.status(400).json({
+        error: 'Could not read the uploaded file.',
+        suggestion: 'Please ensure the file is a valid, uncorrupted Excel document and is not password-protected.'
+      });
+    }
 
     if (extractedData.length === 0) {
       return res.status(400).json({
@@ -25,18 +36,18 @@ export const uploadExcel = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'File processed successfully!',
       emailCount: extractedData.length,
-      // Map the sample to show just the emails in the UI
       emailsSample: extractedData.slice(0, 5).map(r => r.email)
     });
+
   } catch (error: any) {
-    console.error('Error in uploadExcel:', error);
-    res.status(500).json({ error: 'Failed to process Excel file.', message: error.message });
+    // This is a final safeguard for any other unexpected errors
+    console.error('An unexpected error occurred in uploadExcel:', error);
+    return res.status(500).json({ error: 'An unexpected internal server error occurred.' });
   }
 };
-
 
 // --- sendTestEmail ---
 // This function is updated to correctly format the 'from' string
