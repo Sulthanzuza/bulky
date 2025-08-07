@@ -63,7 +63,7 @@ export const sendTestEmail = async (req: Request, res: Response) => {
         const transporter = createTransporter(credentials);
 
         // Uses the sender's email address directly for the 'from' field
-        const fromString = credentials.auth.user;
+        const fromString = `"Aieera Future Marketing" <${credentials.auth.user}>`
 
         await sendEmail(transporter, fromString, testEmail, template);
 
@@ -99,7 +99,7 @@ export const sendBulkEmails = async (req: Request, res: Response) => {
         const transporter = createTransporter(credentials);
 
         // Uses the sender's email address directly for the 'from' field
-        const fromString = credentials.auth.user;
+        const fromString = `"Aieera Future Marketing" <${credentials.auth.user}>`
 
         let sent = 0;
         let failed = 0;

@@ -38,7 +38,7 @@ export const mapCredentials = (creds: FrontendCredentials): EmailCredentials => 
     provider,
     host,
     port,
-    // `secure` is true if port is 465, otherwise false (for STARTTLS on 587)
+
     secure: creds.secure !== undefined ? creds.secure : port === 465,
     auth: {
       user: creds.email,
@@ -47,7 +47,7 @@ export const mapCredentials = (creds: FrontendCredentials): EmailCredentials => 
   };
 };
 
-// Creates the Nodemailer transporter with the corrected configuration
+
 export const createEmailTransporter = (config: EmailCredentials): nodemailer.Transporter => {
   console.log('Creating transporter with config:', {
     host: config.host,
