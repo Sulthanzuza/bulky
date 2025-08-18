@@ -13,7 +13,7 @@ function App() {
 
       <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center space-x-4">
-          <img src='/logo.png' alt="Aieera Automation Logo" className="h-10 w-auto" />
+          <img src='./logo.png' alt="Aieera Automation Logo" className="h-10 w-auto" />
           <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Aieera Automation</h1>
         </div>
       </header>
