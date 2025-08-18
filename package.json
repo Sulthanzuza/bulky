@@ -23,6 +23,9 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.4.1",
+    "react-particles": "^2.12.2",
+    "tsparticles-engine": "^2.12.0",
+    "tsparticles-slim": "^2.12.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

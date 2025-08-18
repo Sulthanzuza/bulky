@@ -42,8 +42,6 @@ app.use(express.json());
 app.use('/api', emailRoutes);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT);
 
 export default app;

@@ -49,12 +49,7 @@ export const mapCredentials = (creds: FrontendCredentials): EmailCredentials => 
 
 
 export const createEmailTransporter = (config: EmailCredentials): nodemailer.Transporter => {
-  console.log('Creating transporter with config:', {
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    user: config.auth.user,
-  });
+
 
   // This single configuration works for both Office 365 and other SMTP servers
   return nodemailer.createTransport({
@@ -86,11 +81,10 @@ export const sendEmail = async (
   template: EmailTemplate
 ): Promise<void> => {
   try {
-    // Verify connection first
-    console.log('Verifying SMTP connection...');
+    
     
     await transporter.verify();
-    console.log('SMTP connection verified successfully');
+ 
 
     await transporter.sendMail({
       from,
@@ -98,7 +92,7 @@ export const sendEmail = async (
       subject: template.subject,
       html: template.body,
     });
-    console.log(`Email sent to ${to}`);
+    
   } catch (error) {
     console.error('Email sending failed:', error);
     // The error will be caught and handled in the controller
