@@ -6,7 +6,6 @@ import logo from '../logo.png'
 function App() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      <ParticlesBackground/>
       <Toaster position="top-right" toastOptions={{
         success: { style: { background: 'white', color: '#16a34a' } },
         error: { style: { background: 'white', color: '#dc2626' } },
